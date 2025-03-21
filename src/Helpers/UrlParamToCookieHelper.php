@@ -29,6 +29,28 @@ class UrlParamToCookieHelper
     }
 
     /**
+     * @return array
+     */
+    public static function get_populated_cookies(): array
+    {
+        $populated = [];
+
+        $mappings = self::get_configured_url_param_mappings();
+
+        foreach ($mappings as $param => $cookieName) {
+            $value = $_COOKIE[$cookieName];
+
+            if (empty($value)) {
+                continue;
+            }
+
+            $populated[$param] = $value;
+        }
+
+        return $populated;
+    }
+
+    /**
      * @return void
      */
     public static function url_params_to_cookies(): void
