@@ -1,0 +1,17 @@
+{
+    "name": "digital-nature/wp-url-param-to-cookie",
+    "description": "Creates a cookie for each of the configured URL parameters",
+    "type": "wordpress-plugin",
+    "autoload": {
+        "psr-4": {
+            "DigitalNature\\UrlParamToCookie\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Digital Nature",
+            "email": "hello@digital-nature.co.uk"
+        }
+    ],
+    "require": {}
+}
