@@ -1,6 +1,9 @@
 <?php
 namespace DigitalNature\UrlParamToCookie\Helpers;
 
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 class UrlParamToCookieHelper
 {
     const DEFAULT_PREFIX = 'dn_uptc_';
@@ -8,23 +11,49 @@ class UrlParamToCookieHelper
     /**
      * @TODO make this dynamic, so that it can be configured through wp admin
      *
-     * The URL params that we will capture and convert into cookies
+     * The URL params that we will capture and convert into cookies, plus their configuration
      *
      * @return array
      */
     public static function get_configured_url_param_mappings(): array
     {
         return [
-            'utm_source' => self::DEFAULT_PREFIX . 'utm_source',
-            'utm_medium' => self::DEFAULT_PREFIX . 'utm_medium',
-            'utm_campaign' => self::DEFAULT_PREFIX . 'utm_campaign',
-            'utm_term' => self::DEFAULT_PREFIX . 'utm_term',
-            'utm_content' => self::DEFAULT_PREFIX . 'utm_content',
-            'utm_id' => self::DEFAULT_PREFIX . 'utm_id',
-            'fbclid' => self::DEFAULT_PREFIX . 'fbclid',
-            'gclid' => self::DEFAULT_PREFIX . 'gclid',
-            'wbraid' => self::DEFAULT_PREFIX . 'wbraid',
-            'gbraid' => self::DEFAULT_PREFIX . 'gbraid',
+            'defaults' => [
+                'ttl' => 3600,
+                'path' => '/',
+            ],
+            'params' => [
+                'utm_source' => [
+                    'name' => self::DEFAULT_PREFIX . 'utm_source',
+                ],
+                'utm_medium' => [
+                    'name' => self::DEFAULT_PREFIX . 'utm_medium',
+                ],
+                'utm_campaign' => [
+                    'name' => self::DEFAULT_PREFIX . 'utm_campaign',
+                ],
+                'utm_term' => [
+                    'name' => self::DEFAULT_PREFIX . 'utm_term',
+                ],
+                'utm_content' => [
+                    'name' => self::DEFAULT_PREFIX . 'utm_content',
+                ],
+                'utm_id' => [
+                    'name' => self::DEFAULT_PREFIX . 'utm_id',
+                ],
+                'fbclid' => [
+                    'name' => self::DEFAULT_PREFIX . 'fbclid',
+                ],
+                'gclid' => [
+                    'name' => self::DEFAULT_PREFIX . 'gclid',
+                ],
+                'wbraid' => [
+                    'name' => self::DEFAULT_PREFIX . 'wbraid',
+                ],
+                'gbraid' => [
+                    'name' => self::DEFAULT_PREFIX . 'gbraid',
+                ],
+            ],
         ];
     }
 
@@ -37,8 +66,8 @@ class UrlParamToCookieHelper
 
         $mappings = self::get_configured_url_param_mappings();
 
-        foreach ($mappings as $param => $cookieName) {
-            $value = $_COOKIE[$cookieName];
+        foreach ($mappings as $param => $cookieConfig) {
+            $value = $_COOKIE[$cookieConfig['name']];
 
             if (empty($value)) {
                 continue;
@@ -51,19 +80,25 @@ class UrlParamToCookieHelper
     }
 
     /**
+     * Saves to cookies server-side
+     *
      * @return void
      */
-    public static function url_params_to_cookies(): void
+    public static function save_url_params_to_cookies(): void
     {
-        $urlParamMappings = self::get_configured_url_param_mappings();
+        $configuration = self::get_configured_url_param_mappings();
+        $urlParamMappings = $configuration['params'];
+        $defaults = $configuration['defaults'];
 
-        foreach ($urlParamMappings as $param => $cookieName) {
+        foreach ($urlParamMappings as $param => $cookieConfig) {
             if (!empty($_REQUEST[$param])) {
+                $ttl = $cookieConfig['ttl'] ?? $defaults['ttl'];
+
                 setcookie(
-                    $cookieName,
+                    $cookieConfig['name'],
                     $_REQUEST[$param],
-                    strtotime("+4 hours"),
-                    '/'
+                    time() + $ttl,
+                    $cookieConfig['path'] ?? $defaults['path']
                 );
             }
         }

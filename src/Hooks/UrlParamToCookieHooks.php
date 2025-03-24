@@ -1,14 +1,17 @@
 <?php
 namespace DigitalNature\UrlParamToCookie\Hooks;
 
-
 use DigitalNature\UrlParamToCookie\Helpers\UrlParamToCookieHelper;
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class UrlParamToCookieHooks
 {
     public function __construct()
     {
-        add_action('wp_loaded', [$this, 'wp_loaded']);
+        // @TODO make server side capture optional and include this if it's active
+        //add_action('wp_loaded', [$this, 'wp_loaded']);
     }
 
     /**
@@ -16,6 +19,6 @@ class UrlParamToCookieHooks
      */
     public function wp_loaded(): void
     {
-        UrlParamToCookieHelper::url_params_to_cookies();
+        UrlParamToCookieHelper::save_url_params_to_cookies();
     }
 }
